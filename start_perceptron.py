@@ -5,10 +5,10 @@ import random
 import numpy
 
 inputNodeCount = 2
-hiddenNodeCount = 60
+hiddenNodeCount = 100
 outputNodeCount = 5
 layerCount = 3
-learningRate = 0.3
+learningRate = 0.1
 
 perc = Perceptron(inputNodeCount,  # Число входных нейронов (признаков)
                   hiddenNodeCount, # Число скрытых (промежуточных) нейронов

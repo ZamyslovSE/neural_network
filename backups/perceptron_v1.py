@@ -36,21 +36,17 @@ class Perceptron:
         
     # Обучение нейронной сети
     def train(self, input_list, target_list):
-        # преобразование списка входных значений
-        # в двухмерный массив
+        
         inputs = numpy.array(input_list, ndmin=2).T
         targets = numpy.array(target_list, ndmin=2).T
-        # рассчитать входящие сигналы для скрытого слоя
+        
         hidden_inputs = numpy.dot(self.Wih, inputs)
-        # рассчитать исходящие сигналы для скрытого слоя
         hidden_outputs = self.activation_function(hidden_inputs)
-        # рассчитать входящие сигналы для выходного слоя
+        
         final_inputs = numpy.dot(self.Who, hidden_outputs)
-        # рассчитать исходящие сигналы для выходного слоя
         final_outputs = self.activation_function(final_inputs)
         print('TRAINING. OUTPUT:\n {0}\n EXPECTED OUTPUT:\n {1}'.format(final_outputs, targets))
-        # ошибки выходного слоя =
-        # (целевое значение - фактическое значение)
+        
         output_errors = targets - final_outputs
         # ошибки скрытого слоя - это ошибки output_errors,
         # распределенные пропорционально весовым коэффициентам связей
