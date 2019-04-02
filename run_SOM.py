@@ -1,31 +1,34 @@
 from SOM import SOM
+from SOM import Neuron
 import matplotlib.pyplot as pyplot
 import random
 import numpy
 import ast
 
 varCount = 2
-gridCount = 50
+gridCount = 80
 learningRate = 0.1
 searchRadius = 0.4
-tau = 100
-pointCount = 300
+tau1 = 1000
+tau2 = 1000
+pointCount = 1500
 
 #INIT NEURON MATRIX
 ar = numpy.linspace(0.0, 1.0, gridCount)
 neurons = []
 for i in range(gridCount):
     for j in range(gridCount):
-        neurons.append([ar[i], ar[j]])
+        neurons.append(Neuron([ar[i], ar[j]],[i,j]))
         
 som = SOM(neurons, varCount, learningRate)
 
 def randomColor(classCount): # Задание случайного цвета для отображения множества
+    vals = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
     colorArr = []
     for j in range(classCount):  
         color = '#'
         for i in range(6):
-            color += str(random.randint(0, 9))
+            color += vals[random.randint(0, 15)]
         colorArr.append(color)
     return colorArr
 
@@ -58,9 +61,9 @@ def visualize(points, neurons): # Метод для визуализации м�
     x = []
     y = []
     for j in range(neurons.__len__()):
-        x.append(neurons[j][0])
-        y.append(neurons[j][1])
-    pyplot.scatter(x,y,c=colorArr[1],alpha=0.9,s=5, marker="s")
+        x.append(neurons[j].W[0])
+        y.append(neurons[j].W[1])
+    pyplot.scatter(x,y,c=colorArr[1],alpha=0.4,s=5, marker="s")
     pyplot.gca().set_xlim([0, 1])
     pyplot.gca().set_ylim([0, 1])
     pyplot.gca().set_aspect('equal', adjustable='box')
@@ -72,5 +75,5 @@ points = read('generated_sets/output_p300_cl10_var2_int0.txt')
 #visualize(points)
 pointsFlat = flattenArray(points)
 random.shuffle(pointsFlat)
-som.train(pointsFlat[0:pointCount], searchRadius, tau)
+som.train(pointsFlat[0:pointCount], 5, searchRadius, tau1, tau2)
 visualize(pointsFlat[0:pointCount], som.neurons)
