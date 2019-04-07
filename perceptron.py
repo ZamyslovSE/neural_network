@@ -39,10 +39,15 @@ class Perceptron:
         if (actFunc == 'softmax'):
             self.activation_function = lambda x: scipy.special.softmax(x)
             
-        self.guesses = 0
-        self.correct_guesses = 0
-        self.graph_y = []
-        self.graph_x = []
+        self.guesses_T = 0
+        self.correct_guesses_T = 0
+        self.graph_y_T = []
+        self.graph_x_T = []
+        
+        self.guesses_V = 0
+        self.correct_guesses_V = 0
+        self.graph_y_V = []
+        self.graph_x_V = []
         
         print('FINISH INIT PERCEPTRON')
         
@@ -73,15 +78,20 @@ class Perceptron:
         
         final_outputs = outputs[len(outputs)-1]
         
+        maxV = final_outputs[0]
+        maxI = 0
+        for i in range(len(targets)):
+            if (final_outputs[i] > maxV):
+                maxI = i
+                maxV = final_outputs[i]
+            if (targets[i] != 0):
+                if (final_outputs[i] > 0.55):
+                    self.correct_guesses_T += 1
+            self.graph_x_T.append(self.guesses_T)
+            self.graph_y_T.append(self.correct_guesses_T)
+        self.guesses_T += 1
+        
         output_errors = (targets - final_outputs)
-#        dH = numpy.zeros((len(targets),len(targets)))
-#        for i in range(len(targets)):
-#            for j in range(len(targets)):
-#                if (i == j):
-#                    dH[i, i] = final_outputs[i] * (1 - final_outputs[i])
-#                else:
-#                    dH[i, j] = -final_outputs[i] * final_outputs[j]
-#        output_errors = numpy.dot(dH, (final_outputs - targets))
         
         errors = [output_errors]
         for i in reversed(range(len(W))):
@@ -95,7 +105,8 @@ class Perceptron:
         for i in range(self.layerCount-2):
             self.Whh[i] = W[i+1]
         self.Who = W[self.layerCount]
-        pass
+        
+        return Point(maxI, input_list)
       
     # Запрос к нейронной сети
     def query(self, input_list, targets):
@@ -116,22 +127,27 @@ class Perceptron:
         for i in range(len(W)-1):
             hidden_inputs = numpy.dot(W[i], outputs[i])
             #hidden_outputs = scipy.special.expit(hidden_inputs)
-            hidden_outputs = numpy.tanh(hidden_inputs)
+            hidden_outputs = scipy.special.expit(hidden_inputs)
             outputs.append(hidden_outputs)
             
         hidden_inputs = numpy.dot(W[len(W)-1], outputs[len(W)-1])
-        hidden_outputs = numpy.tanh(hidden_inputs)
+        hidden_outputs = scipy.special.expit(hidden_inputs)
         outputs.append(hidden_outputs)
         
         final_outputs = outputs[len(outputs)-1]
         
         #print('VALIDATE. OUTPUT:\n {0}\n EXPECTED OUTPUT:\n {1}'.format(final_outputs, targets))
+        maxV = final_outputs[0]
+        maxI = 0
         for i in range(len(targets)):
+            if (final_outputs[i] > maxV):
+                maxI = i
+                maxV = final_outputs[i]
             if (targets[i] != 0):
                 if (final_outputs[i] > 0.55):
-                    self.correct_guesses += 1
-            self.graph_x.append(self.guesses)
-            self.graph_y.append(self.correct_guesses)
-        self.guesses += 1
+                    self.correct_guesses_V += 1
+            self.graph_x_V.append(self.guesses_V)
+            self.graph_y_V.append(self.correct_guesses_V)
+        self.guesses_V += 1
                     
-        return final_outputs
+        return Point(maxI, input_list)
