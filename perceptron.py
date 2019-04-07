@@ -1,6 +1,6 @@
 import numpy
 import scipy.special
-
+import math
 
 class Point:
     # Конструктор
@@ -15,7 +15,7 @@ class Point:
         return f'[{self.classNum}, {self.vars}]'
 class Perceptron:
     # Конструктор
-    def __init__(self, inputNodeCount, hiddenNodeCount, outputNodeCount, layerCount, learningRate):
+    def __init__(self, inputNodeCount, hiddenNodeCount, outputNodeCount, layerCount, learningRate, actFunc):
         print('START INIT PERCEPTRON')
         print('PARAMETERS: inputs={0} hidden={1} output={2} layerCount={3}'.format(inputNodeCount, hiddenNodeCount, outputNodeCount, layerCount))
 
@@ -34,12 +34,21 @@ class Perceptron:
             self.Whh.append(numpy.random.rand(self.hiddenNodeCount, self.hiddenNodeCount) - 0.5)
         self.Who = (numpy.random.rand(self.outputNodeCount, self.hiddenNodeCount) - 0.5)
         
-        self.activation_function = lambda x: scipy.special.expit(x)
+        if (actFunc == 'sigmoid'):
+            self.activation_function = lambda x: scipy.special.expit(x)
+        if (actFunc == 'softmax'):
+            self.activation_function = lambda x: scipy.special.softmax(x)
+            
+        self.guesses = 0
+        self.correct_guesses = 0
+        self.graph_y = []
+        self.graph_x = []
         
         print('FINISH INIT PERCEPTRON')
         
     # Обучение нейронной сети
     def train(self, input_list, target_list):
+        
         inputs = numpy.array(input_list, ndmin=2).T
         targets = numpy.array(target_list, ndmin=2).T
         
@@ -53,14 +62,20 @@ class Perceptron:
         #start_outputs = self.activation_function(start_inputs)
         #outputs.append(start_outputs)
         
-        for i in range(len(W)):
+        for i in range(len(W)-1):
             hidden_inputs = numpy.dot(W[i], outputs[i])
-            hidden_outputs = self.activation_function(hidden_inputs)
+            hidden_outputs = scipy.special.expit(hidden_inputs)
             outputs.append(hidden_outputs)
+            
+        hidden_inputs = numpy.dot(W[len(W)-1], outputs[len(W)-1])
+        hidden_outputs = scipy.special.softmax(hidden_inputs)
+        outputs.append(hidden_outputs)
         
         final_outputs = outputs[len(outputs)-1]
+        #for i in range(len(final_outputs)):
+            
+        #print('TRAINING. OUTPUT:\n {0}\n EXPECTED OUTPUT:\n {1}'.format(final_outputs, targets))
         
-        print('TRAINING. OUTPUT:\n {0}\n EXPECTED OUTPUT:\n {1}'.format(final_outputs, targets))
         
         output_errors = targets - final_outputs
         errors = [output_errors]
@@ -79,13 +94,39 @@ class Perceptron:
         pass
       
     # Запрос к нейронной сети
-    def query(self, input_list):
+    def query(self, input_list, targets):
+        
         inputs = numpy.array(input_list, ndmin=2).T
+        #targets = numpy.array(target_list, ndmin=2).T
         
-        start_inputs = numpy.dot(self.Wih, inputs)
-        start_outputs = self.activation_function(start_inputs)
+        W = [self.Wih]
+        for Wi in self.Whh:
+            W.append(Wi)
+        W.append(self.Who)
+        outputs = [inputs]
         
-        final_inputs = numpy.dot(self.Who, start_outputs)
-        final_outputs = self.activation_function(final_inputs)
+        #start_inputs = numpy.dot(self.Wih, inputs)
+        #start_outputs = self.activation_function(start_inputs)
+        #outputs.append(start_outputs)
         
+        for i in range(len(W)-1):
+            hidden_inputs = numpy.dot(W[i], outputs[i])
+            hidden_outputs = scipy.special.expit(hidden_inputs)
+            outputs.append(hidden_outputs)
+            
+        hidden_inputs = numpy.dot(W[len(W)-1], outputs[len(W)-1])
+        hidden_outputs = scipy.special.softmax(hidden_inputs)
+        outputs.append(hidden_outputs)
+        
+        final_outputs = outputs[len(outputs)-1]
+        
+        #print('VALIDATE. OUTPUT:\n {0}\n EXPECTED OUTPUT:\n {1}'.format(final_outputs, targets))
+        for i in range(len(targets)):
+            if (targets[i] != 0):
+                if (final_outputs[i] > 0.55):
+                    self.correct_guesses += 1
+            self.graph_x.append(self.guesses)
+            self.graph_y.append(self.correct_guesses)
+        self.guesses += 1
+                    
         return final_outputs

@@ -7,7 +7,7 @@ points = [] # Массив точек
 centers = [] # Массив центров классов
 
 pointCount = 300 # Количество точек в классе
-classCount = 10  # Количество классов
+classCount = 20  # Количество классов
 varCount = 2     # Количество признаков
 radius = 0.04     # Радиус сферы
 intersectionCount = 0 # Количество пересечений
@@ -133,6 +133,6 @@ def read(fileName):
     text_file.close()
     return points
 
-points = read('generated_sets/output_p300_cl10_var2_int0.txt')
-visualize(points)
-#generateAndWrite()
+#points = read('generated_sets/output_p300_cl5_var2_int0.txt')
+#visualize(points)
+generateAndWrite()
