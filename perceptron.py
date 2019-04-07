@@ -68,18 +68,22 @@ class Perceptron:
             outputs.append(hidden_outputs)
             
         hidden_inputs = numpy.dot(W[len(W)-1], outputs[len(W)-1])
-        hidden_outputs = scipy.special.softmax(hidden_inputs)
+        hidden_outputs = scipy.special.expit(hidden_inputs)
         outputs.append(hidden_outputs)
         
         final_outputs = outputs[len(outputs)-1]
-        #for i in range(len(final_outputs)):
-            
-        #print('TRAINING. OUTPUT:\n {0}\n EXPECTED OUTPUT:\n {1}'.format(final_outputs, targets))
         
+        output_errors = (targets - final_outputs)
+#        dH = numpy.zeros((len(targets),len(targets)))
+#        for i in range(len(targets)):
+#            for j in range(len(targets)):
+#                if (i == j):
+#                    dH[i, i] = final_outputs[i] * (1 - final_outputs[i])
+#                else:
+#                    dH[i, j] = -final_outputs[i] * final_outputs[j]
+#        output_errors = numpy.dot(dH, (final_outputs - targets))
         
-        output_errors = targets - final_outputs
         errors = [output_errors]
-        index = 0
         for i in reversed(range(len(W))):
             hidden_errors = numpy.dot(W[i].T, errors[0])
             W[i] += self.learningRate * numpy.dot((errors[0] * outputs[i+1] * (1.0 - outputs[i+1])), numpy.transpose(outputs[i]))
@@ -111,11 +115,12 @@ class Perceptron:
         
         for i in range(len(W)-1):
             hidden_inputs = numpy.dot(W[i], outputs[i])
-            hidden_outputs = scipy.special.expit(hidden_inputs)
+            #hidden_outputs = scipy.special.expit(hidden_inputs)
+            hidden_outputs = numpy.tanh(hidden_inputs)
             outputs.append(hidden_outputs)
             
         hidden_inputs = numpy.dot(W[len(W)-1], outputs[len(W)-1])
-        hidden_outputs = scipy.special.softmax(hidden_inputs)
+        hidden_outputs = numpy.tanh(hidden_inputs)
         outputs.append(hidden_outputs)
         
         final_outputs = outputs[len(outputs)-1]

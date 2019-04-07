@@ -8,17 +8,18 @@ import numpy
 pointCount = 300
 intersectionCount = 0
 inputNodeCount = 2
-hiddenNodeCount = 60
+hiddenNodeCount = 100
 outputNodeCount = 20
 layerCount = 3
-learningRate = 0.2
+learningRate = 0.3
+outputMode = 'n'
 
 perc = Perceptron(inputNodeCount,  # Число входных нейронов (признаков)
                   hiddenNodeCount, # Число скрытых (промежуточных) нейронов
                   outputNodeCount, # Число выходных нейронов
                   layerCount,      # Число слоев
                   learningRate,
-                  'softmax') 
+                  outputMode) 
 
 
 def readDataFromFile(fileName):
